@@ -1,0 +1,23 @@
+operations:
+  view:
+    - type: web
+      impl: index.html
+actions: actions
+web: web-src
+runtimeManifest:
+  packages:
+    dx-excshell-1:
+      license: Apache-2.0
+      actions:
+        webhook:
+          function: actions/webhook/index.js
+          web: raw
+          runtime: 'nodejs:14'
+          inputs:
+            LOG_LEVEL: debug
+            SOCKET_CLUSTER_ID: demo
+            SOCKET_API_KEY: VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV
+            SOCKET_API_SECRET: Fvev5c0k59VZ1jRLWuj5URyF5idSdHWm
+          annotations:
+            require-adobe-auth: false
+            final: true

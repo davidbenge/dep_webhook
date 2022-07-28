@@ -1,0 +1,39 @@
+/*
+* <license header>
+*/
+
+
+html,
+body {
+  margin: 0;
+}
+
+.basic-url{
+  color: #333;
+  font-weight: bold;
+}
+
+.webhook-url-wrapper{
+  border: 0px solid #333;
+  display: table;
+  box-sizing: border-box;
+  border-radius: 5px;
+  padding: 0px 5px 0px 5px;
+}
+
+.webhook-url {
+  font-weight: 500;
+  margin-right: 10px;
+}
+
+.webhook-url-channel {
+  font-weight: normal;
+}
+
+.input-group-btn{
+  margin-left: 10px;
+}
+
+#logListElm > li{
+  list-style-type: none;
+}
