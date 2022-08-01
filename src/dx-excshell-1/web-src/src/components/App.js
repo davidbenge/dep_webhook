@@ -6,18 +6,18 @@ import React, { useEffect, useState } from 'react'
 import { Provider, defaultTheme, Grid, View, Heading, Flex, ActionButton, Item, Text, useListData } from '@adobe/react-spectrum'
 import {ListView} from '@react-spectrum/list'
 import ErrorBoundary from 'react-error-boundary'
-import { PayloadList } from './PayloadList'
-import Button from '@spectrum-icons/workflow/Button'
 import LearnerSelect from './LearnerSelect'
-import {useAsyncList} from '@react-stately/data';
 
 function App (props) {
-  const [learnerId, setLearnerId] = useState()
-  const [loglist,setLoglist] = useState([])
-  const [selectedWebhookCall, setSelectedWebhookCall] = useState(null)
+  //const [learnerId, setLearnerId] = useState()
+  //const [loglist,setLoglist] = useState([])
+  //const [selectedWebhookCall, setSelectedWebhookCall] = useState(null)
   const [displayedWebhookCall, setDisplayedWebhookCall] = useState()
   const [connectionButtonText, setConnectionButtonText] = useState("")
-  const [socketConnectionStatus, setSocketConnectionStatus] = useState(false)
+  //const [socketConnectionStatus, setSocketConnectionStatus] = useState(false)
+  let learnerId = undefined
+  let socketConnectionStatus = false
+  let selectedWebhookCall = null 
   const apiKey = 'VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV'
   let piesocket = undefined
   const cluster = "demo"
@@ -32,7 +32,7 @@ function App (props) {
 
   const handleHookCallSelectionChange = (keys) => {
     console.log('handleHookCallSelectionChange', keys['currentKey'])
-    setSelectedWebhookCall(keys['currentKey'])
+    selectedWebhookCall = keys['currentKey']
     setDisplayedWebhookCall(webhookCallsList.getItem(selectedWebhookCall))
     console.log('selectedWebhookCall', selectedWebhookCall)
     console.log('displayedWebhookCall', displayedWebhookCall)
@@ -49,56 +49,59 @@ function App (props) {
   })
 
   const handleLearnerInputChange = (plearnerId) => {
-
-    console.log('piesocket.readyState',piesocket?.readyState)
-
+    console.log(`in handleLearnerInputChange with socketConnectionStatus = ${socketConnectionStatus}`)
+          
     //Toggle the connection
     if(socketConnectionStatus) {
-      console.log('disconnecting')
-      //piesocket.close(1000, "Work complete")
-      webhookCallsList.remove()
-      setSelectedWebhookCall()
-      setDisplayedWebhookCall()
+      console.log(`setting socketConnectionStatus to false`)
+      //setSocketConnectionStatus(false)
+      socketConnectionStatus = false
       setConnectionButtonText("connect")
-      if(typeof piesocket !== 'undefined') {
-        piesocket.close(1000, "Work complete")
-      }else{
-        setSocketConnectionStatus(false)
+    }else{
+      console.log(`setting socketConnectionStatus to true`)
+      //setSocketConnectionStatus(true)
+      socketConnectionStatus = true
+      setConnectionButtonText("disconnect")
+    }
+
+    console.log(`in handleLearnerInputChange post toggle with socketConnectionStatus = ${socketConnectionStatus}`)
+
+    if(typeof plearnerId !== 'undefined' && socketConnectionStatus) {
+      console.log(`in payload list setting learner id ${plearnerId}`);
+      //learnerId = plearnerId;
+      //setLearnerId(plearnerId);
+      this.learnerId = plearnerId;
+      piesocket = new WebSocket(`wss://${cluster}.piesocket.com/v3/${plearnerId}?api_key=${apiKey}&notify_self`);
+      
+      piesocket.onmessage = function(message) {
+        if(!socketConnectionStatus){
+          console.log(`in onmessage and closing with socketConnectionStatus = ${socketConnectionStatus}`);
+          try {
+            piesocket.close(1000, "Work complete")
+          } catch (error) {}
+        }
+        const data = JSON.parse(message.data);
+        data['call-time'] = (data['call-time']*1000);
+        webhookCallsList.append(data.event);
+        console.log(`Socket incoming message: ${message.data}`);
+      }
+
+      piesocket.onclose = function(event) {
+        console.log(`closing socket: ${event}`)
+      }
+
+      piesocket.onopen = () => {
+        console.log(`connected to websocket wss://${cluster}.piesocket.com/v3/${plearnerId}?api_key=${apiKey}&notify_self`);
       }
     }else{
-      setConnectionButtonText("disconnect")
-      console.log(`in payload list handleLearnerInputChange ${plearnerId}`);
-
-      if(typeof plearnerId !== 'undefined') {
-        console.log(`in payload list setting learner id ${plearnerId}`);
-        //learnerId = plearnerId;
-        setLearnerId(plearnerId);
-        piesocket = new WebSocket(`wss://${cluster}.piesocket.com/v3/${plearnerId}?api_key=${apiKey}&notify_self`);
-
-        piesocket.onmessage = function(message) {
-          if(!socketConnectionStatus){
-            piesocket.close(1000, "Work complete")
-          }
-          const data = JSON.parse(message.data);
-          data['call-time'] = (data['call-time']*1000);
-          webhookCallsList.append(data.event);
-          console.log(`Socket incoming message: ${message.data}`);
-        }
-
-        piesocket.onclose = function(event) {
-          console.log(`closing socket: ${event}`)
-          setSocketConnectionStatus(false)
-          setConnectionButtonText("connect")
-        }
-
-        piesocket.onopen = () => {
-          console.log(`connected to websocket wss://${cluster}.piesocket.com/v3/${plearnerId}?api_key=${apiKey}&notify_self`);
-          setSocketConnectionStatus(true)
-          setConnectionButtonText("disconnect")
-        }
-      }else{
-        console.error(`in handleLearnerInputChange and learner object is undefined`);
-      }
+      try{
+        console.log(`in main else and closing with socketConnectionStatus = ${socketConnectionStatus}`);
+        webhookCallsList.remove()
+        selectedWebhookCall = null
+        selectedWebhookCall = null
+        piesocket.close(1000, "Work complete")
+      }catch(e){}
+      console.error(`in handleLearnerInputChange and learner object is undefined`);
     }
   }
 
@@ -151,14 +154,12 @@ function App (props) {
                   selectionStyle="highlight"
                   aria-label="Websocket post events"
                   items={webhookCallsList.items}
-                  onAction={(key) => alert(`Triggering action on item ${key}`)}
+                  //onAction={handleHookCallSelectionChange}
                   onSelectionChange={handleHookCallSelectionChange}
                 >
                 {(item) => (
-                  <Item key={item.key}>
-                    <View>
-                    <Text>{new Date((item['call-time']*1000)).toLocaleString("en-US")}</Text>
-                    </View>
+                  <Item key={item.key} textValue={item.key}>
+                    {new Date((item['call-time']*1000)).toLocaleString("en-US")}
                   </Item>
                 )}
                 </ListView>               

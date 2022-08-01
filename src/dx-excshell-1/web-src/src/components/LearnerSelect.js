@@ -5,15 +5,10 @@ import React, { useState, useEffect } from 'react';
 import '@spectrum-css/typography';
 import '@spectrum-css/table';
 import {
-  ComboBox, 
-  Item, 
-  Section,
   Flex,
   View,
   TextField,
   Button,
-  Text,
-  Heading
 } from '@adobe/react-spectrum';
 import Cookies from 'js-cookie';
 import actions from '../config';
