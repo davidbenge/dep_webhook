@@ -48,6 +48,17 @@ function App (props) {
     console.log('history change', { type, path })
   })
 
+  const clearWebhookCallList = () =>{
+    for(item in webhookCallsList.items){
+      console.log('clearWebhookCallList item',webhookCallsList.items[item])
+      webhookCallsList.remove(webhookCallsList.items[item].id)
+    }
+  }
+
+  const clearButtonOnPress = (e) => {
+    clearWebhookCallList()
+  }
+
   const handleLearnerInputChange = (plearnerId) => {
     console.log(`in handleLearnerInputChange with socketConnectionStatus = ${socketConnectionStatus}`)
           
@@ -143,7 +154,7 @@ function App (props) {
             </View>
             <View gridArea="headerBarRight" padding="size-20">
               <Flex direction="column" justifyContent="center" alignItems="end">
-                <ActionButton width="size-1000">Clear</ActionButton>
+                <ActionButton width="size-1000" onPress={clearButtonOnPress}>Clear</ActionButton>
               </Flex>
             </View>
 

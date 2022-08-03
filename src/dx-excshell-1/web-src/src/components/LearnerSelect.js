@@ -30,7 +30,7 @@ function LearnerSelect ({onSelectChange,connectionStatusText="Connect",...props}
 
   return (
     <Flex direction="row" height="size-800" gap="size-100" justifyContent="center" alignContent="center">
-      <View width="size-8000" >{actions['webhook']}</View>
+      <View width="size-8000" >{actions['webhook']}/</View>
       <View width="size-2500">
         <TextField UNSAFE_className="webhook-url-channel" onChange={handleInputChange} value={selectedLearnerId} aria-label="webhook channel url" />
       </View>
