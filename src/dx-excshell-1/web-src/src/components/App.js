@@ -38,6 +38,11 @@ function App (props) {
     console.log('displayedWebhookCall', displayedWebhookCall)
   }
 
+  //get json value for dot notation path
+  const getDescendantProp = (obj, path) => (
+    path.split('.').reduce((acc, part) => acc && acc[part], obj)
+  );
+
   // use exc runtime event handlers
   // respond to configuration change events (e.g. user switches org)
   props.runtime.on('configuration', ({ imsOrg, imsToken, locale }) => {
@@ -170,7 +175,7 @@ function App (props) {
                 >
                 {(item) => (
                   <Item key={item.key} textValue={item.key}>
-                    {new Date((item['call-time']*1000)).toLocaleString("en-US")}
+                    {new Date((item['call-time']*1000)).toLocaleString("en-US")} {item['query-params'].guid ? `- ${item['query-params'].guid}` : ''} {item['query-params'].GUID ? `- ${item['query-params'].GUID}` : ''} {item['query-params'].namespace ? `- ${item['query-params'].namespace}` : ''} {item['query-params']['custom_path'] ? `- ${getDescendantProp(item,item['query-params']['custom_path'])}` : ''}
                   </Item>
                 )}
                 </ListView>               
