@@ -58,6 +58,7 @@ function App (props) {
       console.log('clearWebhookCallList item',webhookCallsList.items[item])
       webhookCallsList.remove(webhookCallsList.items[item].id)
     }
+    setDisplayedWebhookCall("")
   }
 
   const clearButtonOnPress = (e) => {
@@ -123,52 +124,53 @@ function App (props) {
 
   return (
     <ErrorBoundary onError={onError} FallbackComponent={fallbackComponent}>
-      <Provider theme={defaultTheme} colorScheme={`light`}>
+      <Provider theme={defaultTheme} colorScheme={`light`} >
       <Grid
         areas={[
           'header header',
           'sidebar content'
         ]}
         columns={['2fr', '2fr']}
-        rows={['size-1000', 'auto']}
-        gap="size-100">
-        <View gridArea="header">
+        rows={['size-1600', 'auto']}
+        gap="size-100"
+        height="100vh">
+        <View gridArea="header" backgroundColor="static-white">
           <Flex direction="column" justifyContent="center" alignItems="center">
-            <Heading level={1}>Webhook Test Viewer</Heading>
+            <Heading level={1}>Development Webhook</Heading>
+          </Flex>
+          <Flex>
+            <View marginBottom="size-125" marginStart="size-500" marginTop="size-100">
+              <LearnerSelect onSelectChange={handleLearnerInputChange} connectionStatusText={connectionButtonText} {...props}></LearnerSelect>
+            </View>
           </Flex>
         </View>
-        <View gridArea="sidebar">
+        <View gridArea="sidebar" marginStart="size-500" backgroundColor="static-white" marginBottom="size-100">
           <Grid
           areas={[
-            'connectBar connectBar',
             'headerBarLeft headerBarRight',
             'resultList resultList'
           ]}
           columns={['2fr', '2fr']}
           rows={['size-500','size-500', 'auto']}
-          height="size-6000"
+          height="100%"
           gap="size-0">
-            <View gridArea="connectBar" padding="size-50">
-              <LearnerSelect onSelectChange={handleLearnerInputChange} connectionStatusText={connectionButtonText} {...props}></LearnerSelect>
-            </View>
-
-            <View gridArea="headerBarLeft" padding="size-150">
+            <View gridArea="headerBarLeft" padding="size-75">
               <Flex direction="column" justifyContent="center" alignItems="start">
                 <Heading level={3} margin="0">All Requests</Heading>
               </Flex>
             </View>
-            <View gridArea="headerBarRight" padding="size-20">
+            <View gridArea="headerBarRight" padding="size-50">
               <Flex direction="column" justifyContent="center" alignItems="end">
                 <ActionButton width="size-1000" onPress={clearButtonOnPress}>Clear</ActionButton>
               </Flex>
             </View>
-
-            <View gridArea="resultList">
-              <Flex direction="column" height="100%">
+            <View gridArea="resultList" height="100vh">
+              <Flex direction="column">
                 <ListView
                   selectionMode="single"
                   selectionStyle="highlight"
                   aria-label="Websocket post events"
+                  height="100vh"
                   items={webhookCallsList.items}
                   //onAction={handleHookCallSelectionChange}
                   onSelectionChange={handleHookCallSelectionChange}
@@ -183,7 +185,7 @@ function App (props) {
             </View>
           </Grid>
         </View>
-        <View gridArea="content">
+        <View gridArea="content" marginEnd="size-500" backgroundColor="static-white" marginBottom="size-100">
           {displayedWebhookCall ? (
             <Flex direction="column" marginStart="size-500" marginEnd="size-500" >
               <View backgroundColor="gray-50">
@@ -193,7 +195,7 @@ function App (props) {
               </View>
             </Flex>
           ) : ''}
-        </View>
+        </View> 
       </Grid>
       </Provider>
     </ErrorBoundary>
